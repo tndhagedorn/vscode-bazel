@@ -134,10 +134,18 @@ export class BazelQuery extends BazelCommand {
       // the server is shared for all the queries.
       const ws = getBazelWorkspaceFolder(this.workingDirectory);
       const hash = crypto.createHash("md5").update(ws).digest("hex");
-      const outputBase = path.join(os.tmpdir(), hash);
-      additionalStartupOptions = additionalStartupOptions.concat([
-        `--output_base=${outputBase}`,
-      ]);
+      // Put output base if a prefix defined in settings, otherwise use default tmp dir
+      // This allows things like --experimental_repository_cache_hardlinks to work
+      // in the case where different output bases for the same project would be
+      // on different filesystems
+      const prefix = bazelConfig.get<string>("outputBasePrefix");
+
+      const outputBase = path.join(prefix ?? os.tmpdir(), hash);
+      // Make sure --output_base is first in case user wants to override this
+      // entirely in bazel.commandLine.startupOptions
+      additionalStartupOptions = [`--output_base=${outputBase}`].concat(
+        additionalStartupOptions,
+      );
     }
     return new Promise((resolve, reject) => {
       const execOptions = {
