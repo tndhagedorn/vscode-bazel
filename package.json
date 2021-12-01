@@ -1,6 +1,6 @@
 {
     "name": "vscode-bazel",
-    "displayName": "Bazel",
+    "displayName": "Bazel - with DaveH output_base fix",
     "description": "Bazel BUILD integration",
     "version": "0.5.0",
     "publisher": "BazelBuild",
@@ -108,7 +108,7 @@
                 "bazel.queriesShareServer": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Use the same Bazel server for queries and builds. By default, vscode-bazel uses a separate server for queries so that they can be executed in parallel with builds. You can enable this setting if running multiple Bazel servers has a negative performance impact on your system, but you may experience degraded performance in Visual Studio Code for operations that require queries."
+                    "description": "Use the same Bazel server for queries and builds. By default, vscode-bazel uses a separate server with its own --output_base for queries so that they can be executed in parallel with builds. You can enable this setting if running multiple Bazel servers has a negative performance impact on your system, but you may experience degraded performance in Visual Studio Code for operations that require queries."
                 },
                 "bazel.enableCodeLens": {
                     "type": "boolean",
@@ -141,7 +141,12 @@
                     "uniqueItems": true,
                     "default": [],
                     "markdownDescription": "A list of Bazel command line options to use when building or running tests. From the [common options](https://docs.bazel.build/versions/master/command-line-reference.html#options-common-to-all-commands) and [build options](https://docs.bazel.build/versions/master/command-line-reference.html#build) (`test` honors all `build` options). One option per entry, no shell escaping is needed."
-                }
+                },
+                "bazel.outputBasePrefix": {
+                    "type": "string",
+                    "uniqueItems": true,
+                    "markdownDescription": "Prefix to apply to the path this plugin generates for each workspace's `--output_base` (defaults to OS' tmp dir).  Applies when `queriesShareServer` is set to `false` - meaning a separate output base is required.  See [output directory layout](https://docs.bazel.build/versions/main/output_directories.html) for more options.  If you use --experimental_repository_cache_hardlinks you will want this path to be on the same mount/FS as your --repository_cache to allow linking to external [repository content](https://docs.bazel.build/versions/main/guide.html#the-repository-cache) and reduce downloads/copies"
+                }                
             }
         },
         "debuggers": [
